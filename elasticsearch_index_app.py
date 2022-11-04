@@ -19,9 +19,9 @@ def read_csv(csv_file_path):
 
 def index_csv(index, data):
     es = Elasticsearch(hosts=ES_ENDPOINT, request_timeout=600)
+    
+    print(f"Create index/docs: {index}")
     docs_created = 0
-
-    print(f"Create index: {index}")
     for item in data:
         response = es.index(index=index, id=str(uuid.uuid4()), document=item)
 
