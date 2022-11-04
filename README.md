@@ -10,7 +10,7 @@ Run application:
 - Install Elasticsearch - ./scripts/es_install.ksh
 - Install Kibana - ./scripts/kibana_install.ksh
 - Create Python virtual environment - ./scripts/venv_create.ksh
-- Run the application providing a path to CSV file - python elasticsearch_index_app.py ./data/soccer-standings.csv
+- Run the application providing a path to CSV file - python3 elasticsearch_index_app.py ./data/soccer-standings.csv
 
 Check results:
 - Connect to DevTools in Kibana - http://localhost:5601/app/dev_tools 
