@@ -3,42 +3,39 @@ import os
 import sys
 import uuid
 
-from elasticsearch import Elasticsearch
+from elasticsearch import Elasticsearch, helpers as es_helper
 
 ES_ENDPOINT=f"http://localhost:9200"
 
-def read_csv(csv_file_path):
-    print(f"Input file: {csv_file_path}")
+def gen_docs(csv_file_path):
+    print(f"CSV file: {csv_file_path}")
+
+    index = os.path.basename(csv_file_path).split('.')[0]
+    print(f"Index: {index}")
 
     with open(csv_file_path, mode="r", encoding='utf-8-sig') as csv_file:
         csv_reader = csv.DictReader(csv_file)
-        data = list(csv_reader)
 
-    print(f"Total lines read: {len(data)}")
-    return data
+        for row in csv_reader:
+            doc = {
+                "_index": index,
+                "_id": str(uuid.uuid4()),
+                "_source": row
+            }
+            yield doc
 
-def index_csv(index, data):
-    es = Elasticsearch(hosts=ES_ENDPOINT, request_timeout=600)
-    
-    print(f"Create index/docs: {index}")
-    docs_created = 0
-    for item in data:
-        response = es.index(index=index, id=str(uuid.uuid4()), document=item)
-
-        if response.get('result') == 'created':
-            docs_created += 1
-
-    print(f"Total documents created: {docs_created}")
+def post_docs(es_client, docs):
+    es_resp = es_helper.bulk(client=es_client, actions=docs)
+    print(f"Docs posted: {es_resp[0]}")
 
 def main(argv):
     csv_file_path = argv[1]
-    index = os.path.basename(csv_file_path).split('.')[0]
 
-    print("\nRead CSV...")
-    data = read_csv(csv_file_path)
+    print("\nInit ES client...")
+    es_client = Elasticsearch(hosts=ES_ENDPOINT, request_timeout=600)
 
-    print("\nIndex CSV...")
-    index_csv(index, data)
+    print("\nPost docs into ES...")
+    post_docs(es_client, gen_docs(csv_file_path))
 
 if __name__ == "__main__":
     main(sys.argv)
