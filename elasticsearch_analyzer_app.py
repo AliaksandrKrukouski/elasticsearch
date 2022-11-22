@@ -34,9 +34,11 @@ def read_html_doc(html_doc_path):
 def run_analyzer(es_client, tokenizer, char_filter, text):
     print(f"Tokenizer: {TOKENIZER}")
     print(f"Char filter: {CHAR_FILTER}")
-    print(f"Text to analyze: {text}")
+    print(f"Before analyzing: {text}")
+
     tokens = es_client.indices.analyze(tokenizer=tokenizer, char_filter=char_filter, text=text)
-    print(f"Result tokens: {tokens}")
+    text_analyzed = tokens['tokens'][0]['token']
+    print(f"After analyzing:\n{text_analyzed.strip()}")
 
 def main(argv):
     html_doc_path = argv[1]
