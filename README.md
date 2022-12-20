@@ -43,7 +43,6 @@ Follow the instructions on screen to choose required query type and provide inpu
 **Check results** \
 In console output see documents matched with provided criteria.
 
-
 ##Clean up
 After finishing with running the applications:
 - Delete Elasticsearch - *./scripts/es_drop.ksh*
