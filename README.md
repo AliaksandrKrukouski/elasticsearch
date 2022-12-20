@@ -33,6 +33,17 @@ To run the application provide a path to HTML document to be analyzed - *python3
 **Check results** \
 In console output Roman numbers should be replaced with its Arabic variation and HTML tags should be removed from provided HTML document.
 
+### elasticsearch_search_app
+This application provides ability to search data loaded from data/netflix_titles.csv into Elasticsearch. It uses different types of queries for search like match, term, range etc.
+
+**Run application** \
+To run the application execute in command line - *python3 elasticsearch_search_app.py.\
+Follow the instructions on screen to choose required query type and provide input values for search parameters.
+
+**Check results** \
+In console output see documents matched with provided criteria.
+
+
 ##Clean up
 After finishing with running the applications:
 - Delete Elasticsearch - *./scripts/es_drop.ksh*
