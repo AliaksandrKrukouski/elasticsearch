@@ -37,7 +37,7 @@ In console output Roman numbers should be replaced with its Arabic variation and
 This application provides ability to search data loaded from data/netflix_titles.csv into Elasticsearch. It uses different types of queries for search like match, term, range etc.
 
 **Run application** \
-To run the application execute in command line - *python3 elasticsearch_search_app.py.\
+To run the application execute in command line - *python3 elasticsearch_search_app.py*.\
 Follow the instructions on screen to choose required query type and provide input values for search parameters.
 
 **Check results** \
