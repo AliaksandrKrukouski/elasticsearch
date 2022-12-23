@@ -1,7 +1,8 @@
 # Elasticsearch applications
 This repository contains elasticsearch applications:
-- elastcsearch_index_app
-- elasticsearch_analyzer_app
+- [elastcsearch_index_app](#elasticsearch_index_app)
+- [elasticsearch_analyzer_app](#elasticsearch_analyzer_app)
+- [elasticsearch_search_app](#elasticsearch_search_app)
 
 ## Prerequisites
 Before running the applications: 
