@@ -3,6 +3,7 @@ This repository contains elasticsearch applications:
 - [elastcsearch_index_app](#elasticsearch_index_app)
 - [elasticsearch_analyzer_app](#elasticsearch_analyzer_app)
 - [elasticsearch_search_app](#elasticsearch_search_app)
+- [elasticsearch_agg_app](#elasticsearch_agg_app)
 
 ## Prerequisites
 Before running the applications: 
@@ -43,6 +44,17 @@ Follow the instructions on screen to choose required query type and provide inpu
 
 **Check results** \
 In console output see documents matched with provided criteria.
+
+### elasticsearch_agg_app
+This application provides ability to analyze movie related data loaded from data/ml-latest-small. It uses different types of analytical queries.
+
+**Run application** \
+To run the application execute in command line - *python3 elasticsearch_agg_app.py*.\
+Follow the instructions on screen to choose required query and provide input values for search parameters.
+
+**Check results** \
+In console output see the results.
+
 
 ## Clean up
 After finishing with running the applications:
