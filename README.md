@@ -4,7 +4,7 @@ This repository contains elasticsearch applications:
 - [elasticsearch_analyzer_app](#elasticsearch_analyzer_app)
 - [elasticsearch_search_app](#elasticsearch_search_app)
 - [elasticsearch_agg_app](#elasticsearch_agg_app)
-- [logstash http_poller pipeline](#logstash http_poller pipeline) 
+- [logstash http_poller pipeline](#logstash_http_poller_pipeline) 
 
 ## Prerequisites
 Before running the applications: 
@@ -56,7 +56,7 @@ Follow the instructions on screen to choose required query and provide input val
 **Check results** \
 In console output see the results.
 
-### logstash http_poller pipeline
+### logstash_http_poller_pipeline
 This pipeline loads data from REST API endpoint into Elasticsearch using Logstash.
 
 **Run pipeline** \
