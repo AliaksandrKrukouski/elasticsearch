@@ -4,6 +4,7 @@ This repository contains elasticsearch applications:
 - [elasticsearch_analyzer_app](#elasticsearch_analyzer_app)
 - [elasticsearch_search_app](#elasticsearch_search_app)
 - [elasticsearch_agg_app](#elasticsearch_agg_app)
+- [logstash http_poller pipeline](#logstash_http_poller_pipeline) 
 
 ## Prerequisites
 Before running the applications: 
@@ -55,6 +56,23 @@ Follow the instructions on screen to choose required query and provide input val
 **Check results** \
 In console output see the results.
 
+### logstash http_poller pipeline
+This pipeline loads data from REST API endpoint into Elasticsearch using Logstash.
+
+**Run pipeline** \
+To start the pipeline execute in command line - *source ./scripts/logstash_install.ksh*.
+
+**Check results** \
+Navigate to Dev Tools in Elasticsearch UI and execute a query below to see loaded documents:
+```
+GET /logstash_http_poller/_search
+{
+    "query": {
+        "match_all": {}
+    }
+}
+```
+To stop the pipeline run in command line - *docker stop logstash* 
 
 ## Clean up
 After finishing with running the applications:
