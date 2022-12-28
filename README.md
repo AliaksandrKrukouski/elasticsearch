@@ -4,7 +4,7 @@ This repository contains elasticsearch applications:
 - [elasticsearch_analyzer_app](#elasticsearch_analyzer_app)
 - [elasticsearch_search_app](#elasticsearch_search_app)
 - [elasticsearch_agg_app](#elasticsearch_agg_app)
-- [logstash http_poller pipeline](#logstash_http_poller_pipeline) 
+- [logstash http_poller pipeline](#logstash http_poller pipeline) 
 
 ## Prerequisites
 Before running the applications: 
