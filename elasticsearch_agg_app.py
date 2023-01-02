@@ -23,7 +23,8 @@ RATINGS_CSV = "ratings.csv"
 RATINGS_MAPPING = {
     "userId": {"type": "keyword"},
     "movieId": {"type": "keyword"},
-    "rating": {"type": "double"}
+    "rating": {"type": "double"},
+    "timestamp": {"type": "date", "format": "epoch_second"}
 }
 
 TAGS_INDEX = "tags"
@@ -35,10 +36,41 @@ TAGS_MAPPING = {
     "timestamp": {"type": "date", "format": "epoch_second"}
 }
 
+MOVIES_DENORMALIZED_INDEX = "movies_denormalized"
+MOVIES_DENORMALIZED_JSON = "movies_denormalized.json"
+MOVIES_DENORMALIZED_MAPPING = {
+    "movieId": {"type": "keyword"},
+    "title": {"type": "text",
+              "fields": {
+                  "raw": {
+                      "type":  "keyword"
+                  }
+              }},
+    "genres": {"type": "text"},
+    "tags": {"type": "nested",
+             "properties":
+                 {
+                     "userId": {"type": "keyword"},
+                     "tag": {"type": "keyword"},
+                     "timestamp": {"type": "date", "format": "epoch_second"}
+                 }
+             },
+    "ratings": {"type": "nested",
+                "properties":
+                    {
+                        "userId": {"type": "keyword"},
+                        "rating": {"type": "keyword"},
+                        "timestamp": {"type": "date", "format": "epoch_second"}
+                    }
+                }
+}
+
 ALL_INDEXES = [
-    {"index_name": MOVIES_INDEX, "file_name": MOVIES_CSV, "mapping": MOVIES_MAPPING},
-    {"index_name": RATINGS_INDEX, "file_name": RATINGS_CSV, "mapping": RATINGS_MAPPING},
-    {"index_name": TAGS_INDEX, "file_name": TAGS_CSV, "mapping": TAGS_MAPPING}
+    {"index_name": MOVIES_INDEX, "file_name": MOVIES_CSV, "file_format": "CSV", "mapping": MOVIES_MAPPING},
+    {"index_name": RATINGS_INDEX, "file_name": RATINGS_CSV, "file_format": "CSV", "mapping": RATINGS_MAPPING},
+    {"index_name": TAGS_INDEX, "file_name": TAGS_CSV, "file_format": "CSV", "mapping": TAGS_MAPPING},
+    {"index_name": MOVIES_DENORMALIZED_INDEX, "file_name": MOVIES_DENORMALIZED_JSON, "file_format": "JSON",
+     "mapping": MOVIES_DENORMALIZED_MAPPING}
 ]
 
 def get_movies_by_title(es_client, movie):
@@ -56,14 +88,19 @@ def get_movies_by_title(es_client, movie):
 
 def init(es_client):
     for idx in ALL_INDEXES:
-        index_name, file_name, mapping = idx.values()
+        index_name, file_name, file_foramt, mapping = idx.values()
         file_path = DATA_PATH + "/" + file_name
 
         print(f"Create {index_name} index...")
         utils.create_index(index_name, mapping, es_client)
 
         print(f"Ingest data for {index_name} index...")
-        utils.ingest_data(data=utils.parse_csv(index_name, file_path), es_client=es_client)
+        if file_foramt == "CSV":
+            utils.ingest_data(data=utils.parse_csv(index_name, file_path), es_client=es_client)
+        elif file_foramt == "JSON":
+            utils.ingest_data(data=utils.parse_json(index_name, file_path), es_client=es_client)
+        else:
+            raise Exception("ERROR: Unsupported file format. Should be CSV or JSON.")
 
 def run_search(es_client):
     while True:
@@ -72,7 +109,9 @@ def run_search(es_client):
         prompt += "\n2 - Search movie by title (fuzzy query)"
         prompt += "\n3 - Search movie by rate (sub agg query)"
         prompt += "\n4 - Top 10 tags for the movie (bucket agg query)"
-        prompt += "\n5 - Top rated movies by the user (boolean query)"
+        prompt += "\n5 - Top 10 tags for the movie (nested query/denorm data)"
+        prompt += "\n6 - Top rated movies by the user (boolean query)"
+        prompt += "\n7 - Top rated movies by the user (nested query/denorm data)"
         prompt += "\n>>> "
 
         in_condition = int(input(prompt))
@@ -111,6 +150,15 @@ def run_search(es_client):
             query = query_builder.match_query("movieId", movie_id)
             aggs = agg_builder.terms_agg("tag", 10)
         elif in_condition == 5:
+            in_movie = input("\nMovie title to search: ")
+
+            tag_terms_agg = agg_builder.terms_agg("tag", path="tags")
+            nested_tag_terms_agg = agg_builder.nested_agg("tags", tag_terms_agg)
+
+            index = MOVIES_DENORMALIZED_INDEX
+            query = query_builder.match_query("title", in_movie)
+            aggs = agg_builder.terms_agg("title.raw", sub_agg=nested_tag_terms_agg)
+        elif in_condition == 6:
             in_user_id = input("\nUserID to search: ")
 
             user_filter = query_builder.term_query("userId", in_user_id)
@@ -118,9 +166,19 @@ def run_search(es_client):
 
             index = RATINGS_INDEX
             query = query_builder.bool_query(filter=[user_filter, rate_filter])
+        elif in_condition == 7:
+            in_user_id = input("\nUserID to search: ")
 
-        print(f"Query: {query}")
-        print(f"Aggs: {aggs}")
+            path = "ratings"
+            user_filter = query_builder.term_query("userId", in_user_id, path=path)
+            rate_filter = query_builder.range_query("rating", 5, path=path)
+            bool_query = query_builder.bool_query(filter=[user_filter, rate_filter])
+
+            index = MOVIES_DENORMALIZED_INDEX
+            query = query_builder.nested_query(path=path, query=bool_query)
+
+        print(f"Query: {json.dumps(query, indent=2)}")
+        print(f"Aggs: {json.dumps(aggs, indent=2)}")
 
         resp = es_client.search(index=index, query=query, aggs=aggs)
         if query:

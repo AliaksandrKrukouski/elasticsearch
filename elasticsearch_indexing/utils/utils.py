@@ -39,6 +39,21 @@ def parse_csv(index, csv_file_path):
             }
             yield doc
 
+def parse_json(index, json_file_path):
+    print(f"Input parameters:")
+    print(f"- index = {index}")
+    print(f"- json_file_path = {json_file_path}")
+
+    with open(json_file_path, mode="r", encoding='utf-8-sig') as json_file:
+        for row in json_file:
+            source = json.loads(row)
+            doc = {
+                "_index": index,
+                "_id": str(uuid.uuid4()),
+                "_source": source
+            }
+            yield doc
+
 def ingest_data(data, es_client=None):
     es = es_client if es_client else _es_client()
 
