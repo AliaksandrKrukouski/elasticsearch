@@ -152,7 +152,7 @@ def run_search(es_client):
         elif in_condition == 5:
             in_movie = input("\nMovie title to search: ")
 
-            tag_terms_agg = agg_builder.terms_agg("tag", path="tags")
+            tag_terms_agg = agg_builder.terms_agg("tag", path="tags", limit=10)
             nested_tag_terms_agg = agg_builder.nested_agg("tags", tag_terms_agg)
 
             index = MOVIES_DENORMALIZED_INDEX
